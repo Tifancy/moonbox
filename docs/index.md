@@ -19,6 +19,7 @@ Will come out soon.
 
 Get Help
 ============
+  
 The fastest way to get response from our developers is to send email to our mail list <edp_support@groups.163.com>,
 and you are also welcome to join our WeChat group for online discussion. 
 ![img-w150](https://github.com/edp963/edp-resource/raw/master/WeChat.jpg)
