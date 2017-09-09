@@ -18,10 +18,10 @@
     </licenses>
 
     <modules>
-        <module>core</module>
         <module>common</module>
-        <module>assembly</module>
+        <module>core</module>
         <module>grid</module>
+        <module>assembly</module>
     </modules>
 
     <properties>
@@ -35,7 +35,7 @@
         <scala.library>2.11</scala.library>
         <scala.version>2.11.8</scala.version>
         <scalatest.version>3.0.0</scalatest.version>
-        <spark.version>2.0.0</spark.version>
+        <spark.version>2.2.0</spark.version>
         <calcite.version>1.8.0</calcite.version>
         <guava.version>18.0</guava.version>
         <elasticsearch.version>2.3.2</elasticsearch.version>
@@ -92,7 +92,7 @@
         </repository>
         <repository>
             <id>ce.thirdparty</id>
-            <url>${thirdparty.url}}</url>
+            <url>${thirdparty.url}</url>
         </repository>
         <repository>
             <id>ce.snapshots</id>

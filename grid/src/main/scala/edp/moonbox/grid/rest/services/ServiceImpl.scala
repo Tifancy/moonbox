@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,17 +20,15 @@
 
 package edp.moonbox.grid.rest.services
 
-import edp.moonbox.core.rest.entities._
 import edp.moonbox.grid.{JobInfo, JobType}
 import edp.moonbox.grid.message._
+import edp.moonbox.grid.rest.entities._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.reflect.ClassTag
 
-/**
-  * Created by edp on 17/7/5.
-  */
+
 trait ServiceImpl extends ServiceInterface {
 
 	val computer: ComputeService

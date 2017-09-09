@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,14 +23,12 @@ package edp.moonbox.grid.rest.routing
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import de.heikoseeberger.akkahttpjson4s.Json4sSupport.ShouldWritePretty
-import edp.moonbox.core.rest.entities._
-import edp.moonbox.core.rest.serializers.JsonSupport
-import edp.moonbox.core.rest.services.ServiceInterface
+import edp.moonbox.grid.rest.entities._
+import edp.moonbox.grid.rest.serializers.JsonSupport
+import edp.moonbox.grid.rest.services.ServiceInterface
 import org.json4s.{DefaultFormats, Formats, jackson}
 
-/**
-  * Created by edp on 17/6/15.
-  */
+
 trait Router extends JsonSupport { self: ServiceInterface =>
     implicit val json4sJacksonFormats: Formats = DefaultFormats
     implicit val serialization = jackson.Serialization

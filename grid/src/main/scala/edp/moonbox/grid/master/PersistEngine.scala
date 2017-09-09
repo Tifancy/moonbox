@@ -1,3 +1,23 @@
+/*-
+ * <<
+ * Moonbox
+ * ==
+ * Copyright (C) 2016 - 2017 EDP
+ * ==
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * >>
+ */
+
 package edp.moonbox.grid.master
 
 import akka.actor.{ActorRef, ActorSystem}
@@ -11,9 +31,8 @@ import org.apache.zookeeper.CreateMode
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
-/**
-  * Created by edp on 9/8/17.
-  */
+
+
 object PersistEngine {
 	def newInstance(conf: MbConf)(implicit system: ActorSystem): PersistInterface = {
 		// TODO
@@ -144,12 +163,14 @@ trait PersistInterface {
 
 }
 
-class ZkPersist(conf: MbConf)(implicit val system: ActorSystem) extends PersistInterface with EdpLogging {
+class ZkPersist(conf: MbConf)(implicit val system: ActorSystem)
+	extends PersistInterface with EdpLogging {
 
 	val persistEnable = conf.persisEnable
 
 	private val zk: CuratorFramework = {
-		val client = CuratorFrameworkFactory.newClient(conf.persistConnectString, new RetryNTimes(3, 5000))
+		val client = CuratorFrameworkFactory.newClient(conf.persistConnectString,
+			new RetryNTimes(3, 5000))
 		client.start()
 		client
 	}

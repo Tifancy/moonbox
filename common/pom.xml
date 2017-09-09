@@ -58,5 +58,11 @@
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_${scala.library}</artifactId>
+            <version>${akka.version}</version>
+        </dependency>
     </dependencies>
 </project>

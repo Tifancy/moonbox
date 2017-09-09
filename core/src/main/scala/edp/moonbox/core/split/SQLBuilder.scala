@@ -26,11 +26,11 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.optimizer.{CollapseProject, CombineUnions}
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules.{Rule, RuleExecutor}
-import org.apache.spark.sql.catalyst.util.quoteIdentifier
 import org.apache.spark.sql.execution.datasources.LogicalRelation
 import org.apache.spark.sql.types.{ByteType, DataType, IntegerType, NullType}
 
 import scala.util.control.NonFatal
+import org.apache.spark.sql.catalyst.util._
 
 /**
  * A builder class used to convert a resolved logical plan into a SQL query string.  Note that not
@@ -38,7 +38,7 @@ import scala.util.control.NonFatal
  * representations (e.g. logical plans that operate on local Scala collections), or are simply not
  * supported by this builder (yet).
  */
-// 用于将resolved logical plan 转化成SQL string
+
 class SQLBuilder(logicalPlan: LogicalPlan, isResult: Boolean) extends Logging {
   require(logicalPlan.resolved,
     "SQLBuilder only supports resolved logical query plans. Current plan:\n" + logicalPlan)
