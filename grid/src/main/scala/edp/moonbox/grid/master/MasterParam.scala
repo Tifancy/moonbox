@@ -1,0 +1,64 @@
+package edp.moonbox.grid.master
+
+import edp.moonbox.common.{EdpLogging, IntParam, Util}
+import edp.moonbox.core.MbConf
+
+import scala.annotation.tailrec
+import scala.collection.JavaConverters._
+/**
+  * Created by edp on 9/7/17.
+  */
+class MasterParam(args: Array[String], val conf: MbConf) extends EdpLogging {
+	var host = "localhost"
+	var port = 2551
+	var restPort = 9099
+
+	conf.set("akka.cluster.roles.0", MbMaster.ROLE)
+	parse(args.toList)
+	logInfo(s"master listen on $host:$port")
+
+	def akka = conf.settings.asScala.filter(_._1.startsWith("akka.")).asJava
+
+	def cacheHostPort: (String, Int) = {
+		val hostPort = conf.cacheServers.split(",").map(_.split(":")).head
+		hostPort(0) -> hostPort(1).toInt
+	}
+
+	@tailrec
+	private def parse(args: List[String]): Unit = args match {
+		case ("--host" | "-h") :: value :: tail =>
+			host = value
+			conf.set("akka.remote.netty.tcp.hostname", value)
+			parse(tail)
+		case ("--port" | "-p") :: IntParam(value) :: tail =>
+			port = value
+			conf.set("akka.remote.netty.tcp.port", value.toString)
+			parse(tail)
+		case "--restPort" :: IntParam(value) :: tail =>
+			restPort = value
+			parse(tail)
+		case ("--help") :: tail =>
+			printUsageAndExit(0)
+		case Nil => // No-op
+		case _ =>
+			printUsageAndExit(1)
+	}
+
+	/**
+	  * Print usage and exit JVM with the given exit code.
+	  */
+	private def printUsageAndExit(exitCode: Int) {
+		// scalastyle:off println
+		System.err.println(
+			"Usage: MbMaster [options]\n" +
+				"\n" +
+				"Options:\n" +
+				"  -h host, --host host   hostname worker connect to\n" +
+				"  -p port, --port port   port to listen on (default: 2551)\n" +
+				"  --restPort port      port for rest request (default: 9099)\n")
+		// scalastyle:on println
+		System.exit(exitCode)
+	}
+
+
+}
