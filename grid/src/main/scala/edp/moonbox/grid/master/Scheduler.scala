@@ -29,7 +29,7 @@ import akka.actor.Terminated
 import edp.moonbox.common.{EdpLogging, Util}
 import edp.moonbox.core.MbConf
 import edp.moonbox.grid._
-import edp.moonbox.grid.message._
+import edp.moonbox.grid.message.{RunJob, _}
 import edp.moonbox.grid.worker.{MbWorker, WorkerState}
 
 import scala.collection.mutable._
@@ -152,8 +152,21 @@ class MasterBackend(conf: MbConf,
 		}
 	}
 
-	private def moveJobFromRunningToComplete(jobState: JobState): Unit = {
+	private def moveJobFromWaitingToRunning(jobState: JobState): Unit = {
+		withPersist {
+			persistEngine.removeWaitingJob {
+				jobState.jobId
+			}
+		}
+		withPersist {
+			persistEngine.addRunningJob {
+				val newJobState = jobState.copy(jobStatus = Running(0), updateTime = currentTimeMillis)
+				runningJobs.put(newJobState.jobId, newJobState).get
+			}
+		}
+	}
 
+	private def moveJobFromRunningToComplete(jobState: JobState): Unit = {
 		withPersist {
 			persistEngine.addCompleteJob {
 				completeJobs.put(jobState.jobId, jobState).get
@@ -185,7 +198,6 @@ class MasterBackend(conf: MbConf,
 				runningJobs.update(jobState.jobId, jobState)
 				jobState
 			}
-
 		}
 	}
 
@@ -209,8 +221,17 @@ class MasterBackend(conf: MbConf,
 		}
 	}
 
+	private def selectWorker(job: JobState): Option[ActorRef] = {
+		job.jobType match {
+			case JobType.ADHOC => {
+				sessionIdToWorker.get(job.sessionId.get)
+			}
+			case _ => workers.find(_._2.freeCores>0).map(_._1)
+		}
+	}
+
 	private def selectWorker(): Option[ActorRef] = {
-		null
+		workers.find(_._2.freeCores>0).map(_._1)
 	}
 
 	private def findJobProgress(jobId: String, sessionId: Option[String]): JobState = {
@@ -258,7 +279,7 @@ class MasterBackend(conf: MbConf,
 		id
 	}
 
-	private def moveJobsFromRunningToWaiting(implicit missingJobIds: Seq[String]): Unit = {
+	private def moveJobsFromRunningToWaiting(missingJobIds: Seq[String]): Unit = {
 		implicit val missingJobStates = missingJobIds.filter(runningJobs.contains)
 			.map { jobId =>
 				val oldJobState = runningJobs.get(jobId).get
@@ -280,9 +301,7 @@ class MasterBackend(conf: MbConf,
 			moveJobsFromRunningToWaiting(jobIds.get.toSeq)
 		}
 	}
-	/**
-	  * move jobs running in leaved worker to waiting queue and remove it from runningJobs
-	  */
+
 	private def handleWorkerLeaveDuringRecovery(): Unit = {
 		val missingWorkerJobs = workerToRunningJobs.filter { case (worker, jobSet) => !workers.contains(worker) }
 		implicit val missingJobIds = missingWorkerJobs.values.flatten.toSeq
@@ -293,7 +312,18 @@ class MasterBackend(conf: MbConf,
 	private def currentTimeMillis: Long = System.currentTimeMillis()
 
 	override def schedule(): Future[Unit] = {
-		Future()
+		Future {
+			if (waitingJobs.nonEmpty) {
+				val job = waitingJobs.head
+				val worker = selectWorker(job)
+				worker match {
+					case Some(w) =>
+						moveJobFromWaitingToRunning(waitingJobs.dequeue())
+						w ! RunJob(job)
+					case None =>
+				}
+			}
+		}
 	}
 
 	private def informAliveWorkers(message: MbMessage): Unit = {

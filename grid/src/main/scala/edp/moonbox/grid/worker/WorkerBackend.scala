@@ -27,7 +27,7 @@ import akka.cluster.ClusterEvent.MemberUp
 import edp.moonbox.common.EdpLogging
 import edp.moonbox.grid.{JobState, Running}
 import edp.moonbox.grid.master.MbMaster
-import edp.moonbox.grid.message.{ActiveMasterHasChanged, MbMessage, RunJob, WorkerRegister}
+import edp.moonbox.grid.message._
 
 import scala.collection.mutable._
 import scala.concurrent.duration._
@@ -47,7 +47,7 @@ class WorkerBackend(endpoint: ActorRef, param: WorkerParam) extends Actor with E
 	}
 
 	override def receive: Receive = {
-		case r@RunJob(_) => {
+		case r@RunJob(jobState) => {
 			handleRunJob(r)
 		}
 

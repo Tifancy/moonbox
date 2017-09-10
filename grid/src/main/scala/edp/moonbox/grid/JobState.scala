@@ -58,6 +58,7 @@ case class JobInfo(jobType: JobType,
                    sqlList: Seq[String],
                    jobDesc: Option[String] = None)
 
+// TODO add previous JobStatus
 case class JobState(jobType: JobType,
                     sessionId: Option[String],
                     jobId: String,
